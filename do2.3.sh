@@ -81,8 +81,8 @@ openssl ocsp -url http://ocsp.tokmakovav.ru:2560 -CAfile $CHAIN -issuer $INTRCER
 
 echo -e "Command to run OCSP:\n    openssl ocsp -port 2560 -index $DBIDX -CA $CHAIN -rkey $OCSPKEYTMP -rsigner $OCSPCERT"
 echo -e "Command to run nginx:\n    docker run -p 443:443 -v `pwd`/nginx.conf:/etc/nginx/nginx.conf:ro -v `pwd`/$RESDIR:/$RESDIR:ro nginx"
-echo -e "Command to check valid cert:\n    curl --cacert $CHAIN 'https://ocsp.valid.tokmakovav.ru/ -v"
-echo -e "Command to check revoked cert (does not work, use Firefox instead, LOL):\n    curl --cacert $CHAIN 'https://ocsp.revoked.tokmakovav.ru/ -v"
+echo -e "Command to check valid cert:\n    curl --cacert $CHAIN 'https://ocsp.valid.tokmakovav.ru/' -v"
+echo -e "Command to check revoked cert (does not work, use Firefox instead, LOL):\n    curl --cacert $CHAIN 'https://ocsp.revoked.tokmakovav.ru/' -v"
 wait
 
 
