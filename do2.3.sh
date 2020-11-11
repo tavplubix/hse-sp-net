@@ -55,8 +55,8 @@ rm "$RESDIR/$PREFIX-ocsp-revoked.csr"
 
 echo -e "\n\nPrint certs\n"
 echo $OCSPCERT && openssl x509 -text -noout -in $OCSPCERT
-echo $VALIDCERT openssl x509 -text -noout -in $VALIDCERT
-echo $REVOKEDCERT openssl x509 -text -noout -in $REVOKEDCERT
+echo $VALIDCERT && openssl x509 -text -noout -in $VALIDCERT
+echo $REVOKEDCERT && openssl x509 -text -noout -in $REVOKEDCERT
 openssl verify -verbose -CAfile $CACERT -untrusted $INTRCERT $OCSPCERT
 openssl verify -verbose -CAfile $CACERT -untrusted $INTRCERT $VALIDCERT
 openssl verify -verbose -CAfile $CACERT -untrusted $INTRCERT $REVOKEDCERT
@@ -79,7 +79,10 @@ sleep 1
 openssl ocsp -url http://ocsp.tokmakovav.ru:2560 -CAfile $CHAIN -issuer $INTRCERT -cert $VALIDCERT
 openssl ocsp -url http://ocsp.tokmakovav.ru:2560 -CAfile $CHAIN -issuer $INTRCERT -cert $REVOKEDCERT
 
-echo "Command to run OCSP: openssl ocsp -port 2560 -index $DBIDX -CA $CHAIN -rkey $OCSPKEYTMP -rsigner $OCSPCERT"
+echo -e "Command to run OCSP:\n    openssl ocsp -port 2560 -index $DBIDX -CA $CHAIN -rkey $OCSPKEYTMP -rsigner $OCSPCERT"
+echo -e "Command to run nginx:\n    docker run -p 443:443 -v `pwd`/nginx.conf:/etc/nginx/nginx.conf:ro -v `pwd`/$RESDIR:/$RESDIR:ro nginx"
+echo -e "Command to check valid cert:\n    curl --cacert $CHAIN 'https://ocsp.valid.tokmakovav.ru/ -v"
+echo -e "Command to check revoked cert (does not work, use Firefox instead, LOL):\n    curl --cacert $CHAIN 'https://ocsp.revoked.tokmakovav.ru/ -v"
 wait
 
 
