@@ -20,9 +20,13 @@ REVOKEDCERT="$RESDIR/$PREFIX-crl-revoked.crt"
 CRL="$RESDIR/$PREFIX.crl"
 CHAIN="$RESDIR/$PREFIX-ca.crt"
 
+DBDIR="./demoCA"
+DBIDX="$DBDIR/index.txt"
+
 mkdir "$RESDIR"
-
-
+mkdir $DBDIR
+touch $DBIDX
+touch "$DBIDX.attr"
 
 openssl genrsa -out $VALIDKEY 2048
 openssl req -new -key $VALIDKEY -out "$RESDIR/$PREFIX-crl-valid.csr" -config ./2.2-valid.conf
@@ -55,4 +59,5 @@ openssl verify -verbose -crl_check -CRLfile $CRL -CAfile $CACERT -untrusted $INT
 cat $CACERT $INTRCERT > $CHAIN
 openssl verify -verbose -crl_check -CRLfile $CRL -CAfile $CHAIN $VALIDCERT
 openssl verify -verbose -crl_check -CRLfile $CRL -CAfile $CHAIN $REVOKEDCERT
+
 
