@@ -18,7 +18,7 @@ REVOKEDKEY="$RESDIR/$PREFIX-crl-revoked.key"
 REVOKEDCERT="$RESDIR/$PREFIX-crl-revoked.crt"
 
 CRL="$RESDIR/$PREFIX.crl"
-CHAIN="TODO"
+CHAIN="$RESDIR/$PREFIX-ca.crt"
 
 mkdir "$RESDIR"
 
@@ -43,9 +43,16 @@ openssl verify -verbose -CAfile $CACERT -untrusted $INTRCERT $VALIDCERT
 openssl verify -verbose -CAfile $CACERT -untrusted $INTRCERT $REVOKEDCERT
 
 
-openssl ca -config ./2.2-crl.conf -gencrl -out $CRL
-openssl x509 -text -noout -in $CRL
-#openssl ca 
+openssl ca -config ./2.2-crl.conf -passin "pass:$PASS" -gencrl -out $CRL
+openssl crl -text -noout -in $CRL
+openssl ca -config ./2.2-crl.conf -passin "pass:$PASS" -revoke $REVOKEDCERT
+openssl ca -config ./2.2-crl.conf -passin "pass:$PASS" -gencrl -out $CRL
+openssl crl -text -noout -in $CRL
 
+openssl verify -verbose -crl_check -CRLfile $CRL -CAfile $CACERT -untrusted $INTRCERT $VALIDCERT
+openssl verify -verbose -crl_check -CRLfile $CRL -CAfile $CACERT -untrusted $INTRCERT $REVOKEDCERT
 
+cat $CACERT $INTRCERT > $CHAIN
+openssl verify -verbose -crl_check -CRLfile $CRL -CAfile $CHAIN $VALIDCERT
+openssl verify -verbose -crl_check -CRLfile $CRL -CAfile $CHAIN $REVOKEDCERT
 
